@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Prompt Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+        }
+        .prompt-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .prompt-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Tailwind shadow-lg */
+        }
+        .nav-button {
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .nav-button.active {
+            background-color: #4f46e5; /* Tailwind indigo-600 */
+            color: white;
+        }
+        .nav-button:not(.active):hover {
+            background-color: #e0e7ff; /* Tailwind indigo-100 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-indigo-700">Image Prompt Library</h1>
+            <p class="text-lg text-gray-600 mt-2">Select a category to see the prompts</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-3 mb-12">
+            </nav>
+
+        <main id="prompt-display" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </main>
+
+        <div id="welcome-message" class="text-center py-10">
+             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h3 class="mt-2 text-xl font-medium text-gray-900">Welcome!</h3>
+            <p class="mt-1 text-md text-gray-500">
+                Please select a category from the menu above to see available prompts.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Data with prompts
+        const promptsData = {
+            "Landscapes": [
+                "Majestic mountains at dawn, shrouded in mist, cinematic lighting.",
+                "Serene beach with turquoise water and palm trees, drone view, National Geographic photography style.",
+                "Mysterious forest with ancient trees and fireflies at night, fantasy art.",
+                "Futuristic cityscape with flying cars and neon lights, cyberpunk.",
+                "Calm lake in an autumn forest, reflecting golden leaves, impressionism.",
+                "Arctic tundra with northern lights, detailed illustration.",
+                "Volcanic landscape with flowing lava under a starry sky, dramatic lighting.",
+                "Picturesque country road leading into the distance, surrounded by blooming fields, pastoral.",
+                "Underwater world with coral reefs and schools of fish, vibrant colors, photorealism.",
+                "Desert with huge dunes at sunset, silhouettes of a camel caravan, cinematic shot."
+            ],
+            "Animals": [
+                "Portrait of a majestic lion with a thick mane, looking directly at the camera, photorealism.",
+                "Hummingbird hovering by an exotic flower, macro shot, vibrant colors.",
+                "Family of pandas playing in a bamboo grove, cute and detailed illustration.",
+                "Wolf howling at the moon in a snowy forest, atmospheric art.",
+                "Dolphins leaping out of the water against a sunset backdrop, dynamic scene.",
+                "Red panda resting on a tree branch, soft focus, anime style.",
+                "Majestic eagle in flight over mountain peaks, wide-angle lens.",
+                "Fantastic creature: a feathered dragon sitting on a cliff, epic scene.",
+                "Domestic cat playing with a ball of yarn in a cozy room, warm light.",
+                "Herd of wild horses galloping across the steppe, sense of freedom and movement."
+            ],
+            "Fantasy": [
+                "Knight in shining armor versus a fire-breathing dragon, epic battle, fantasy art.",
+                "Spaceship exploring an uncharted nebula, science fiction.",
+                "Magical forest with floating islands and glowing plants, surrealism.",
+                "Cyborg detective in a neon city of the future, noir, cyberpunk.",
+                "Ancient artifact emitting magical energy in a dark dungeon.",
+                "Warrior princess on a griffin, flying above the clouds, high fantasy.",
+                "Encounter with an alien creature on a distant planet, concept art.",
+                "City built inside a giant crystal, fantastical architecture.",
+                "Mage casting a fireball spell, dynamic effects.",
+                "Post-apocalyptic world where nature reclaims the ruins of civilization."
+            ],
+            "Architecture": [
+                "Futuristic skyscraper with organic shapes and green terraces, eco-architecture.",
+                "Ancient castle on a clifftop, shrouded in mist, gothic style.",
+                "Modern minimalist house with panoramic windows and ocean views.",
+                "Eastern palace with carved arches and mosaic patterns, detailed interior.",
+                "Abandoned steampunk factory with copper pipes and gears.",
+                "Underwater city with glass domes, illuminated by bioluminescent organisms.",
+                "Wooden cabin in the forest, cozy and fairytale-like, with smoke from the chimney.",
+                "Bridge of incredible design connecting two floating islands, fantastical engineering.",
+                "Library with endless rows of books and spiral staircases, atmosphere of knowledge.",
+                "Temple in the jungle, overgrown with vines, Indiana Jones style."
+            ],
+            "Space": [
+                "Spiral galaxy with billions of stars, Hubble telescope view, astrophotography.",
+                "Astronaut floating in open space with Earth in the background, photorealism.",
+                "Colony on Mars with domed habitats and rovers, science fiction.",
+                "Black hole accreting matter, with an accretion disk, visualization.",
+                "Space station orbiting an unknown planet, detailed design.",
+                "Collision of two planets, cosmic cataclysm, epic scene.",
+                "Butterfly-shaped nebula, vibrant colors and complex structures.",
+                "Spaceship landing on Europa, Jupiter's moon.",
+                "Meteor shower over a night landscape, long exposure.",
+                "Birth of a new star in a gas and dust cloud, spectacular sight."
+            ]
+        };
+
+        const navContainer = document.querySelector('nav');
+        const promptDisplay = document.getElementById('prompt-display');
+        const welcomeMessage = document.getElementById('welcome-message');
+        let currentCategory = null;
+
+        // Function to display prompts
+        function displayPrompts(category) {
+            currentCategory = category;
+            welcomeMessage.classList.add('hidden'); // Hide welcome message
+            promptDisplay.innerHTML = ''; // Clear previous prompts
+            const prompts = promptsData[category];
+            if (prompts) {
+                prompts.forEach(promptText => {
+                    const card = document.createElement('div');
+                    card.className = 'prompt-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg cursor-pointer';
+                    card.textContent = promptText;
+                    // Add copy functionality on click
+                    card.onclick = () => {
+                        navigator.clipboard.writeText(promptText)
+                            .then(() => {
+                                // Optionally, add a notification for successful copy
+                                card.classList.add('bg-green-100');
+                                setTimeout(() => card.classList.remove('bg-green-100'), 1000);
+                                console.log('Prompt copied: ', promptText);
+                            })
+                            .catch(err => {
+                                console.error('Error copying: ', err);
+                            });
+                    };
+                    promptDisplay.appendChild(card);
+                });
+            }
+            updateActiveButton();
+        }
+
+        // Function to update the active button
+        function updateActiveButton() {
+            const buttons = navContainer.querySelectorAll('.nav-button');
+            buttons.forEach(button => {
+                if (button.textContent === currentCategory) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+
+        // Create navigation buttons
+        Object.keys(promptsData).forEach(categoryName => {
+            const button = document.createElement('button');
+            button.className = 'nav-button px-6 py-3 bg-white text-indigo-600 font-medium rounded-lg shadow-sm hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500';
+            button.textContent = categoryName;
+            button.onclick = () => displayPrompts(categoryName);
+            navContainer.appendChild(button);
+        });
+
+        // Initialization: can leave welcome message or show the first category
+        // displayPrompts(Object.keys(promptsData)[0]); // Show the first category by default
+        // Or leave the welcome message as is
+    </script>
+</body>
+</html>
